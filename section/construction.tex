@@ -1,2 +1,45 @@
 \section{Construction}
 The first construction provides aggregatable presentations for anonymous credentials based on BBS signatures \cite{DBLP:conf/eurocrypt/TessaroZ23a}.
+
+
+% \begin{figure}[ht]
+%     \centering
+%     \begin{pchstack}[center,boxed]
+%         \procedure[linenumbering]{$\mathsf{Present}(\sigma_i, \{a_k\}_{k\in[m]}, k^*, \mathsf{nonce})$}{
+%             \text{Parse } \sigma_i := (A_i, e_i) \text{ with } A_i := C_i^{\frac{1}{x+e_i}}, \, C_i=g_1 h_{k^*}^{a_{k^*}}\sprod_{k\in[m]\setminus \{k^*\}} h_k^{a_k} \\
+%             \text{Sample } r_i\sample \ZZ_p \\
+%             \text{Compute } \bar{A_i} \gets A_i^{r_i}, \, \bar{B_i} \gets C_i^{r_i} \bar{A_i}^{-e_i}  \\
+%             \text{Sample } \alpha_i,\beta_i\sample \ZZ_p \\
+%             \text{Compute } U_i \gets C_i^{\alpha_i} \bar{A_i}^{\beta_i} \\
+%             \text{Broadcast } (U_i, \bar{A_i}, \bar{B_i}) \\
+%             \text{Receive } (U_j, \bar{A_j}, \bar{B_j}) \text{ for } j\in[n]\setminus\{i\} \\
+%             \text{Compute } \ch \gets \hash(\bar{A_1}, \ldots, \bar{A_n},\sprod_{i\in[n]} U_i, \sprod_{i\in[n]} \bar{B_i}, \mathsf{nonce}) \\
+%             \pcreturn (B_0, \bar{C}, E, D, \bar{w}, \pi_3)}
+%     \end{pchstack}
+%     \caption{Presentation and Verification Algorithms of $\mathsf{ACAP}_{\mathsf{BBS}}$}
+% \end{figure}
+
+
+\begin{figure}
+    \centering
+    \begin{pcvstack}[center,boxed]
+
+    \procedure{$\mathsf{Present}(\sigma_i, \{a_k\}_{k\in[m]}, k^*, \mathsf{nonce})$}{
+   \text{1. Parse } \sigma_i := (A_i, e_i) \text{ with } A_i := C_i^{\frac{1}{x+e_i}} \text{ and } C_i=g_1 h_{k^*}^{a_{k^*}}\sprod_{k\in[m]\setminus \{k^*\}} h_k^{a_k} \\
+            \text{2. Sample } r_i\sample \ZZ_p \\
+            \text{3. Compute } \bar{A_i} \gets A_i^{r_i}, \, \bar{B_i} \gets C_i^{r_i} \bar{A_i}^{-e_i}  \\
+            \text{4. Sample } \alpha_i,\beta_i\sample \ZZ_p \\
+            \text{5. Compute } U_i \gets C_i^{\alpha_i} \bar{A_i}^{\beta_i} \\
+            \text{6. Broadcast } (U_i, \bar{A_i}, \bar{B_i}) \\
+            \text{7. Receive } (U_j, \bar{A_j}, \bar{B_j})_{j\in[n]\setminus\{i\}} \text{ and set } U \gets \sprod_{i\in[n]} U_i, \, \bar{B} \gets \sprod_{i\in[n]} \bar{B_i} \\
+            \text{9. Compute } \chall \gets \hash(\bar{A_1}, \ldots, \bar{A_n},U, \bar{B}, \mathsf{nonce}) \\
+            \text{10. Compute } s_i \gets \alpha_i + \chall \cdot r_i \text{ and } z_i \gets \beta_i + \chall \cdot (-e_i) \\
+            \text{11. Broadcast } (s_i, z_i) \\ 
+            \text{12. Receive } (s_j, z_j)_{j\in[n]\setminus\{i\}} \text{ and set } s \gets \ssum_{j\in[n]} s_j, \, z \gets \ssum_{j\in[n]} z_j \\
+            \text{12. Output } \presentation := (\bar{A_1}, \ldots, \bar{A_n},U, \bar{B}, s, z, a_{k^*})
+    }
+    \end{pcvstack}
+
+    \caption{Presentation protocol of $\mathsf{ACAP}_{\mathsf{BBS}}$. \todo{does actually only work for one attribute currently}}
+    \label{fig:present}
+\end{figure}
