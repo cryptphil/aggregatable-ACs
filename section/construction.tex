@@ -7,9 +7,9 @@ The first construction provides aggregatable presentations for anonymous credent
 %     \begin{pchstack}[center,boxed]
 %         \procedure[linenumbering]{$\mathsf{Present}(\sigma_i, \{a_k\}_{k\in[m]}, k^*, \mathsf{nonce})$}{
 %             \text{Parse } \sigma_i := (A_i, e_i) \text{ with } A_i := C_i^{\frac{1}{x+e_i}}, \, C_i=g_1 h_{k^*}^{a_{k^*}}\sprod_{k\in[m]\setminus \{k^*\}} h_k^{a_k} \\
-%             \text{Sample } r_i\sample \ZZ_p \\
+%             \text{Sample } r_i\gets \ZZ_p \\
 %             \text{Compute } \bar{A_i} \gets A_i^{r_i}, \, \bar{B_i} \gets C_i^{r_i} \bar{A_i}^{-e_i}  \\
-%             \text{Sample } \alpha_i,\beta_i\sample \ZZ_p \\
+%             \text{Sample } \alpha_i,\beta_i\gets \ZZ_p \\
 %             \text{Compute } U_i \gets C_i^{\alpha_i} \bar{A_i}^{\beta_i} \\
 %             \text{Broadcast } (U_i, \bar{A_i}, \bar{B_i}) \\
 %             \text{Receive } (U_j, \bar{A_j}, \bar{B_j}) \text{ for } j\in[n]\setminus\{i\} \\
@@ -24,11 +24,11 @@ The first construction provides aggregatable presentations for anonymous credent
     \centering
     \begin{pcvstack}[center,boxed]
 
-    \procedure{$\mathsf{Present}(\sigma_i, \{a_k\}_{k\in[m]}, k^*, \mathsf{nonce})$}{
-   \text{1. Parse } \sigma_i := (A_i, e_i) \text{ with } A_i := C_i^{\frac{1}{x+e_i}} \text{ and } C_i=g_1 h_{k^*}^{a_{k^*}}\sprod_{k\in[m]\setminus \{k^*\}} h_k^{a_k} \\
-            \text{2. Sample } r_i\sample \ZZ_p \\
+    \procedure{$\mathsf{Present}(\sigma_i, \{a_k\}_{k\in\idxSet}, \revIdxSet, \mathsf{nonce})$}{
+   \text{1. Parse } \sigma_i := (A_i, e_i) \text{ with } A_i := C_i^{\frac{1}{\sk+e_i}} \text{ and } C_i=g_1 \sprod_{k\in\idxSet} h_k^{a_k} \\
+            \text{2. Sample } r_i\gets \ZZ_p \\
             \text{3. Compute } \bar{A_i} \gets A_i^{r_i}, \, \bar{B_i} \gets C_i^{r_i} \bar{A_i}^{-e_i}  \\
-            \text{4. Sample } \alpha_i,\beta_i\sample \ZZ_p \\
+            \text{4. Sample } \alpha_i,\beta_i\gets \ZZ_p \\
             \text{5. Compute } U_i \gets C_i^{\alpha_i} \bar{A_i}^{\beta_i} \\
             \text{6. Broadcast } (U_i, \bar{A_i}, \bar{B_i}) \\
             \text{7. Receive } (U_j, \bar{A_j}, \bar{B_j})_{j\in[n]\setminus\{i\}} \text{ and set } U \gets \sprod_{i\in[n]} U_i, \, \bar{B} \gets \sprod_{i\in[n]} \bar{B_i} \\
@@ -36,10 +36,30 @@ The first construction provides aggregatable presentations for anonymous credent
             \text{10. Compute } s_i \gets \alpha_i + \chall \cdot r_i \text{ and } z_i \gets \beta_i + \chall \cdot (-e_i) \\
             \text{11. Broadcast } (s_i, z_i) \\ 
             \text{12. Receive } (s_j, z_j)_{j\in[n]\setminus\{i\}} \text{ and set } s \gets \ssum_{j\in[n]} s_j, \, z \gets \ssum_{j\in[n]} z_j \\
-            \text{12. Output } \presentation := (\bar{A_1}, \ldots, \bar{A_n},U, \bar{B}, s, z, a_{k^*})
+            \text{12. Output } \presentation := (\bar{A_1}, \ldots, \bar{A_n},U, \bar{B}, s, z)
     }
     \end{pcvstack}
 
-    \caption{Presentation protocol of $\mathsf{ACAP}_{\mathsf{BBS}}$. \todo{does actually only work for one attribute currently}}
-    \label{fig:present}
+    \caption{Presentation protocol of $\mathsf{ACAP}_{\mathsf{BBS}}$. \todo{does actually only work if all attributes are revealed (so $\revIdxSet = \idxSet$), which are all the same.}}
+    \label{fig:presentation}
+\end{figure}
+
+
+
+\begin{figure}
+    \centering
+    \begin{pcvstack}[center,boxed]
+
+    \procedure{$\mathsf{Verify}(\pk, \presentation, \{a\}_{k\in\revIdxSet}, \mathsf{nonce})$}{
+   \text{1. Parse } \presentation := (\bar{A_1}, \ldots, \bar{A_n},U, \bar{B}, s, z) \\
+   \text{2. Compute } \chall \gets \hash(\bar{A_1}, \ldots, \bar{A_n},U, \bar{B}, \mathsf{nonce}) \\
+   \text{3. Set } C \gets g_1 \sprod_{i\in\revIdxSet} h_i^{z_i} \\
+   \text{4. Check } U \bar{B}^{\chall} = C^s \sprod_{i\in[n]} \bar{A_i}^{z_i} \\  
+   \text{5. Sample } \delta_i \getsr \ZZ_p \text{ of $l_b$ bits} \\
+    \text{5. Check } \pairing(\sprod_{i\in[n]} \bar{A_i}^{\delta_i}, \pk) = \sprod_{i\in[n]} \pairing(\bar{B_i}, g_2)^{\delta_i}
+    }
+    \end{pcvstack}
+
+    \caption{Verification algorithm of $\mathsf{ACAP}_{\mathsf{BBS}}$.}
+    \label{fig:verification}
 \end{figure}
