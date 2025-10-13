@@ -1,6 +1,6 @@
 \section{Construction}
 The first construction provides aggregatable presentations for anonymous credentials based on BBS signatures \cite{DBLP:conf/eurocrypt/TessaroZ23a}.
-
+\todo{Sibling attacks are possible as one can just provide multiple randomized A and B values. If we want to avoid this, we need to additionally provide a list of PRF evaluations where the key is an attribute of the credential}
 
 % \begin{figure}[ht]
 %     \centering
@@ -35,8 +35,8 @@ The first construction provides aggregatable presentations for anonymous credent
             \text{9. Compute } \chall \gets \hash(\bar{A_1}, \ldots, \bar{A_n},U, \bar{B}, \mathsf{nonce}) \\
             \text{10. Compute } s_i \gets \alpha_i + \chall \cdot r_i \text{ and } z_i \gets \beta_i + \chall \cdot (-e_i) \\
             \text{11. Broadcast } (s_i, z_i) \\ 
-            \text{12. Receive } (s_j, z_j)_{j\in[n]\setminus\{i\}} \text{ and set } s \gets \ssum_{j\in[n]} s_j, \, z \gets \ssum_{j\in[n]} z_j \\
-            \text{12. Output } \presentation := (\bar{A_1}, \ldots, \bar{A_n},U, \bar{B}, s, z)
+            \text{12. Receive } (s_j, z_j)_{j\in[n]\setminus\{i\}} \text{ and set } s \gets \ssum_{j\in[n]} s_j \\
+            \text{12. Output } \presentation := (\bar{A_1}, \ldots, \bar{A_n},U, \bar{B}, s, z_1, \ldots, z_n)
     }
     \end{pcvstack}
 
@@ -51,12 +51,12 @@ The first construction provides aggregatable presentations for anonymous credent
     \begin{pcvstack}[center,boxed]
 
     \procedure{$\mathsf{Verify}(\pk, \presentation, \{a\}_{k\in\revIdxSet}, \mathsf{nonce})$}{
-   \text{1. Parse } \presentation := (\bar{A_1}, \ldots, \bar{A_n},U, \bar{B}, s, z) \\
+   \text{1. Parse } \presentation := (\bar{A_1}, \ldots, \bar{A_n},U, \bar{B}, s, z_1, \ldots, z_n) \\
    \text{2. Compute } \chall \gets \hash(\bar{A_1}, \ldots, \bar{A_n},U, \bar{B}, \mathsf{nonce}) \\
    \text{3. Set } C \gets g_1 \sprod_{i\in\revIdxSet} h_i^{z_i} \\
    \text{4. Check } U \bar{B}^{\chall} = C^s \sprod_{i\in[n]} \bar{A_i}^{z_i} \\  
    \text{5. Sample } \delta_i \getsr \ZZ_p \text{ of $l_b$ bits} \\
-    \text{5. Check } \pairing(\sprod_{i\in[n]} \bar{A_i}^{\delta_i}, \pk) = \sprod_{i\in[n]} \pairing(\bar{B_i}, g_2)^{\delta_i}
+    \text{5. Check } \pairing(\sprod_{i\in[n]} \bar{A_i}^{\delta_i}, \pk) = \sprod_{i\in[n]} \pairing(\bar{B}, g_2)^{\delta_i}
     }
     \end{pcvstack}
 
