@@ -1,6 +1,5 @@
-\section{Construction}
-The first construction provides aggregatable presentations for anonymous credentials based on BBS signatures \cite{DBLP:conf/eurocrypt/TessaroZ23a}.
-\todo{Sibling attacks are possible as one can just provide multiple randomized A and B values. If we want to avoid this, we need to additionally provide a list of PRF evaluations where the key is an attribute of the credential}
+\section{Constructing ACAP} \label{sec:constr:acap}
+We construct credentials with aggregatable presentations from BBS signatures \cite{DBLP:conf/eurocrypt/TessaroZ23a}. Our first construction is relevant in settings where the aggregator is trusted by the verifier, potentially being the verifier itself. As we require data origin authentication, we do not consider Sybil attacks in this scenario. For an extended construction for untrusted aggregators, we refer to Section~\ref{sec:constr:sybil}.
 
 % \begin{figure}[ht]
 %     \centering
@@ -20,7 +19,7 @@ The first construction provides aggregatable presentations for anonymous credent
 % \end{figure}
 
 
-\begin{figure}
+\begin{figure}[ht]
     \centering
     \begin{pcvstack}[center,boxed]
 
@@ -46,7 +45,7 @@ The first construction provides aggregatable presentations for anonymous credent
 
 
 
-\begin{figure}
+\begin{figure}[ht]
     \centering
     \begin{pcvstack}[center,boxed]
 
