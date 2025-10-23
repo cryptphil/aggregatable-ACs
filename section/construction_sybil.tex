@@ -1,3 +1,3 @@
-\section{Constructing ACAP with Sybil Protection} \label{sec:constr:sybil}
+\section{ACAP with Client Collusion} \label{sec:constr:sybil}
 
-\todo{Sibling attacks are possible as one can just provide multiple randomized A and B values. If we want to avoid this, we need to additionally provide a list of PRF evaluations where the key is an attribute of the credential}
+In the client collusion model, we consider malicious clients that potentially collude with other clients to pass the authentication check. In particular, this includes Sybil attacks where a malicious client in posession of a credential delegates said credential or produces credential presentations for other parties. There are two main approaches for providing security in this model: (1) we can bind credentials to a client identity or device to prevent delegation and disincentivize producing presentation proofs for other parties (see Davids paper), (2) we introduce limited linkability to a verifier-provided challenge, meaning that repeated presentations of the same credential can be detected. We adopt strategy (2) in the following and present a construction introducing per-challenge linkability.
