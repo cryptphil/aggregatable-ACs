@@ -9,11 +9,19 @@ In the \emph{single-presentation} model, the set of aggregated credentials is re
 }
 
 \subsection{Syntax}
-We define an \emph{Anonymous Credential with Aggregatable Presentations} scheme (ACAP) as a five-tuple of PPT algorithms $(\Setup, \KeyGen, \Sign, \Vfy, \Aggr)$, where $(\Setup, \KeyGen, \Sign, \Vfy)$ are defined as for signature schemes (see Section~\ref{sec:prelims:sig}). The scheme additionally admits two efficient $\Sigma$-protocols for \textit{full disclosure} and \textit{selective disclosure} of attributes. Let $\pi$ denote the transcript of such a proof. Then, the aggregation algorithm is defined as follows:
+We define an \emph{Anonymous Credential with Aggregatable Presentations} scheme (ACAP) as a five-tuple of PPT algorithms $(\Setup, \KeyGen, \Sign, \Vfy, \Aggr)$, where $(\Setup, \KeyGen, \Sign, \Vfy)$ are defined as for signature schemes (see Section~\ref{sec:prelims:sig}). The scheme additionally admits two efficient $\Sigma$-protocols for \textit{full disclosure} and \textit{selective disclosure} of attributes. Let $\pi=(a,\chall,s)$ denote the transcript of such a protocol, where $a$, $\chall$ and $s$ denote the output of the $\Commit$, $\Challenge$ and $\Response$ phases, respectively. The aggregation algorithm is defined as follows:
 \begin{itemize}
-    \item $\pi_{agg} \gets \Aggr(\{\pi_i\}_{i\in[m]})$: On input a set of $m$ presentation proofs $\{\pi_i\}_{i\in[m]}$, the aggregation algorithm outputs an aggregated proof $\pi_{agg}$.
+    \item $\pi_{agg} \gets \Aggr(\{\pi_i\}_{i\in[m]})$: On input a set of $m$ presentation proofs $\{\pi_i\}_{i\in[m]}=\{(a,\chall,s)\}_{i\in[m]}$, the aggregation algorithm outputs an aggregated proof $\pi_{agg}=(a_{agg},\chall,s_{agg},\batchcoeff)$, using a vector of batching coefficients $\batchcoeff\in\ZZ_p^m$.
 \end{itemize}
 
 \subsection{Security}
-Aggregated proofs should satisfy honest-verifier-zero-knowledge (see Section~\missingcite) and a special soundness property modified for the aggregation setting. We define this property as follows: 
-\jnote{We need to check if this makes sense. Intuitively, we want the proof to be extractable even if only a single transcript of the aggregation is given. This might however not be possible.}
+Aggregated proofs should satisfy \emph{completeness}, \emph{honest-verifier-zero-knowledge} (see Section~\missingcite) and a special-soundness property modified for the aggregation setting. We define this property as follows:
+
+\begin{definition}[$m$-Special Soundness]
+We say an ACAP scheme satisfies $m$-special soundness, if there exists an efficient algorithm $\extractor_{\textsf{SS}}$, such that for two sets of $m$ valid, aggregated transcripts $\{\pi_{agg,i}=(a_{agg,i},\chall,s_{agg,i},b_i)\}_{i\in[m]}$ and $\{\pi'_{agg,i}=(a_{agg,i},\chall',s'_{agg,i},b_i)\}_{i\in[m]}$ with $\chall \neq \chall'$, $b_i\neq b_j$, $\forall i,j\in[m], i\neq j$, it holds that $\{(m_i,\sigma_i)\}_{i\in[m]}\gets \extractor(\pi_{agg},\pi'_{agg})$, where $\Vfy(\vk,m_i,\sigma_i)=1$ for all $i\in [m]$.
+\end{definition}
+\jnote{We can only get this for computational adversaries?}
+
+\begin{remark}
+    We will prove security of our construction with respect to aggregated special soudness, assuming that an extractor receives a set of two lists of aggregated proofs. One can construct such lists by rewinding the prover $m$ times using the same randomness, leading to the same commitments $a_i$. The rewinding algorithm would then choose different sets of batching coefficients $\batchcoeff$ in each iteration, either directly in the interactive case or programming the random oracle in the non-interactive case, resulting in different aggregated commitments. This process may be repeated two for different values of $\chall$ to generate the input for $\extractor_\textsf{SS}$.\jnote{This may not be definition-dependent. Probably shouldn't go here.}
+\end{remark}

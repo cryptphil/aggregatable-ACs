@@ -1,25 +1,10 @@
 \section{ACAP in the Multi-Presentation Model} \label{sec:constr:acap}
 We construct credentials with aggregatable presentations from BBS signatures \cite{DBLP:conf/eurocrypt/TessaroZ23a}. Our first construction is relevant in settings where the aggregator is trusted by the verifier, potentially being the verifier itself. As we require data origin authentication, we do not consider Sybil attacks in this scenario. For an extended construction for untrusted aggregators, we refer to Section~\ref{sec:constr:sybil}.
 
-% \begin{figure}[ht]
-%     \centering
-%     \begin{pchstack}[center,boxed]
-%         \procedure[linenumbering]{$\mathsf{Present}(\sigma_i, \{a_k\}_{k\in[m]}, k^*, \mathsf{nonce})$}{
-%             \text{Parse } \sigma_i := (A_i, e_i) \text{ with } A_i := C_i^{\frac{1}{x+e_i}}, \, C_i=g_1 h_{k^*}^{a_{k^*}}\sprod_{k\in[m]\setminus \{k^*\}} h_k^{a_k} \\
-%             \text{Sample } r_i\gets \ZZ_p \\
-%             \text{Compute } \bar{A_i} \gets A_i^{r_i}, \, \bar{B_i} \gets C_i^{r_i} \bar{A_i}^{-e_i}  \\
-%             \text{Sample } \alpha_i,\beta_i\gets \ZZ_p \\
-%             \text{Compute } U_i \gets C_i^{\alpha_i} \bar{A_i}^{\beta_i} \\
-%             \text{Broadcast } (U_i, \bar{A_i}, \bar{B_i}) \\
-%             \text{Receive } (U_j, \bar{A_j}, \bar{B_j}) \text{ for } j\in[n]\setminus\{i\} \\
-%             \text{Compute } \ch \gets \hash(\bar{A_1}, \ldots, \bar{A_n},\sprod_{i\in[n]} U_i, \sprod_{i\in[n]} \bar{B_i}, \mathsf{nonce}) \\
-%             \pcreturn (B_0, \bar{C}, E, D, \bar{w}, \pi_3)}
-%     \end{pchstack}
-%     \caption{Presentation and Verification Algorithms of $\mathsf{ACAP}_{\mathsf{BBS}}$}
-% \end{figure}
+
 
 \jnote{We'll use linenumbering. With cryptocode, right? ... right?}
-\begin{figure}[ht]
+\begin{figure}[!htb]
     \centering
     \begin{pcvstack}[center,boxed]
 
@@ -45,7 +30,7 @@ We construct credentials with aggregatable presentations from BBS signatures \ci
 
 
 
-\begin{figure}[ht]
+\begin{figure}[!htb]
     \centering
     \begin{pcvstack}[center,boxed]
 

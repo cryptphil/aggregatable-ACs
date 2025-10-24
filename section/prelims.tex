@@ -1,5 +1,21 @@
 \section{Preliminaries} \label{sec:prelims}
 
+\subsection{Notation} \label{sec:prelims:notation}
+We use give an overview of the notation used in this work in Table~\ref{tab:notation}.
+
+\begin{table}[!htb]
+    \centering
+    \footnotesize
+    \begin{tabular}{ll}
+        \toprule
+        $n$ & Maximum number of attributes in a credential. \\
+        $m$ & Number of proofs in an aggregation batch. \\
+        \bottomrule
+    \end{tabular}
+    \caption{A summary of the notation used in this paper.}
+    \label{tab:notation}
+\end{table}
+
 \subsection{Signature Schemes} \label{sec:prelims:sig}
 We describe a \emph{Signature} scheme as a four-tuple of the following algorithms:
 \begin{itemize}
@@ -86,3 +102,4 @@ BBS signatures are considered particularly well-suited for anonymous credential 
 
 \subsubsection{Security of BBS Presentation Proofs} \label{sec:prelims:bbs_pres_sec}
 BBS presentation proofs can be shown to be honest-verifier-zero-knowledge and special-sound \cite{DBLP:conf/eurocrypt/TessaroZ23a}. In the case of partial-dislosure, we need to rely on a computation assumptions for special-soundness, as we require an adversary to be unable to break the discrete logarithm of the generators.
+\jnote{Put a definition of HVZK here.}
