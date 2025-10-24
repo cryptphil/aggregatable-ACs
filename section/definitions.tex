@@ -1,3 +1,19 @@
 \section{Anonymous Credentials with Aggregatable Presentations} \label{sec:acap}
-To model the security of our ACAP scheme, we will define Syntax following the lines of other anonymous credential constructions \cite{DBLP:conf/eurocrypt/TessaroZ23a}. Further, we will formally define the security properties we aim to achieve. We present syntax for two kinds of presentation proofs for full and partial disclosure of attributes. These proofs can be combined using an aggregation algorithm $\Aggr$ and we define security properties incorporating this change.
+We define \emph{Anonymous Credentials with Aggregatable Presentations} as anonymous credentials schemes that support an additional aggregation functionality $\Aggr$, allowing parties to combine aggregation proofs. We first define the syntax of $\Aggr$ and then present our modified definition of special soundness for the setting of aggregated proofs. Our definition considers two distinct threat models: 
 
+\paragraph{(1)} {The \emph{multi-presentation} model does not impose restrictions on the number of times a client can present its credential. It allows for duplicates in the aggregated credential list and does not protect against Sybil attacks. Similarly to the classical security model for BBS, this is relevant in settings where a verifier merely wants to validate all aggregated proofs, without considering their number. For instance, this model is applicable to session authentication of a large number of clients. As a single client can potentially open a multitude of sessions at the same time, it is not in the server's interest to validate the number of sessions opened by each credential. 
+}
+
+\paragraph{(2)} {
+In the \emph{single-presentation} model, the set of aggregated credentials is restricted to contain presentations of distinct credentials. In particular, this prohibits Sybil attacks. While Sybil attacks are not specific to the aggregation setting, aggregating proofs can present unique opportunities to detect them, as aggregatable proofs might share common traits or randomness. This setting is realistic in scenarios where a service wants to authenticate a specific number of clients, potentially bound to a user identity. An example of this is physical access control, where the number of people entering a building is controlled. 
+}
+
+\subsection{Syntax}
+We define an \emph{Anonymous Credential with Aggregatable Presentations} scheme (ACAP) as a five-tuple of PPT algorithms $(\Setup, \KeyGen, \Sign, \Vfy, \Aggr)$, where $(\Setup, \KeyGen, \Sign, \Vfy)$ are defined as for signature schemes (see Section~\ref{sec:prelims:sig}). The scheme additionally admits two efficient $\Sigma$-protocols for \textit{full disclosure} and \textit{selective disclosure} of attributes. Let $\pi$ denote the transcript of such a proof. Then, the aggregation algorithm is defined as follows:
+\begin{itemize}
+    \item $\pi_{agg} \gets \Aggr(\{\pi_i\}_{i\in[m]})$: On input a set of $m$ presentation proofs $\{\pi_i\}_{i\in[m]}$, the aggregation algorithm outputs an aggregated proof $\pi_{agg}$.
+\end{itemize}
+
+\subsection{Security}
+Aggregated proofs should satisfy honest-verifier-zero-knowledge (see Section~\missingcite) and a special soundness property modified for the aggregation setting. We define this property as follows: 
+\jnote{We need to check if this makes sense. Intuitively, we want the proof to be extractable even if only a single transcript of the aggregation is given. This might however not be possible.}
