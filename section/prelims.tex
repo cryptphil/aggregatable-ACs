@@ -1,0 +1,88 @@
+\section{Preliminaries} \label{sec:prelims}
+
+\subsection{Signature Schemes} \label{sec:prelims:sig}
+We describe a \emph{Signature} scheme as a four-tuple of the following algorithms:
+\begin{itemize}
+    \item $\pubp\gets\Setup(\secparam)$: On input the security parameter $\secpar$, and a maximum number of attributes $l$, the setup algorithm outputs a set of public parameters $\pubp$.
+    \item $(\sk,\vk)\gets\KeyGen()$: Given the public parameters $\pubp$, the key generation algorithm outputs a signing key $\sk$ and a verification key $\vk$.
+    \item $\sigma\gets\Sign(\sk, \attr)$: On input a signing key $\sk$ and a vector of attributes $\attr=(m_1,\ldots,m_\ell)$, the signing algorithm outputs a credential $\sigma$ containing all attributes $\attr$.
+    \item $0/1\gets \Vfy(\vk,\attr,\sigma)$: The verification algorithm takes the verification key $\vk$, a vector of attributes $\attr$ and a credential $\sigma$ as input and outputs $1$ if the credential is valid for the given attributes and $0$ otherwise.
+\end{itemize}
+
+\subsection{BBS Signatures} \label{sec:prelims:bbs}
+We will build our construction upon the well-established BBS signature scheme \cite{DBLP:conf/crypto/BonehBS04}\cite{DBLP:conf/eurocrypt/TessaroZ23a}. An overview of the respective algorithms can be found in Figure~\ref{fig:bbs}.
+
+\begin{figure*}[!htb]
+    \centering
+  \begin{pchstack}[boxed,center,space=1em]
+	  \begin{pcvstack}[,space=1em]
+        \procedure[headlinecmd={\vspace{.1em}\hrule\vspace{.3em}}]{$\BBS.\Setup(\secparam)$}{
+	    	(p,\grp_1,\grp_2,\grp_T,\pairing)\gets \GGen(\secparam)\\
+            g_1\getsr \grp_1, g_2\getsr \grp_2, \hs\getsr\grp_1^n\\
+	    	\pcreturn (p,g_1,g_2,\hs,\grp_1,\grp_2,\grp_T,\pairing)
+	    }
+        \procedure[headlinecmd={\vspace{.1em}\hrule\vspace{.3em}}]{$\BBS.\KeyGen(\pubp)$}{
+            x\getsr\mathbb{Z}_p\\
+	    	\pcreturn (x,g_1^x)
+	    }
+      \end{pcvstack}
+      \begin{pcvstack}[,space=1em]
+        \procedure[headlinecmd={\vspace{.1em}\hrule\vspace{.3em}}]{$\BBS.\Sign(\sk,\attr)$}{
+	    	C\gets g_1\prod_i h_i^{\msg_i}\\
+            e\getsr\mathbb{Z}_p\\ 
+            A\gets C^{\frac{1}{x+e}}\\
+            \pcreturn (A,e)
+        }
+        \procedure[headlinecmd={\vspace{.1em}\hrule\vspace{.3em}}]{$\BBS.\Vfy(\vk,\attr,\sigma=(A,e))$}{
+	    	C\gets g_1\prod_i h_i^{\msg_i}\\
+	    	\pcreturn \pairing(A,g_2^e\vk) \overset{?}{=} \pairing(C,g_2)
+	    }
+      \end{pcvstack}
+    \end{pchstack}
+    \caption{The BBS signature scheme. The maximum number of attributes $n$ and group generation algorithm $\GGen$ are considered parameters of the scheme. The public parameters $\pubp$ are an implicit input to all algorithms.}
+    \label{fig:bbs}
+\end{figure*}
+
+\subsubsection{Security of BBS} \label{sec:prelims:bbs_sec}
+As showin in \cite{DBLP:conf/eurocrypt/TessaroZ23a}, the BBS signature scheme can be proven strongly unforgeable under chosen message attacks in the standard model, by a reduction to the \texttt{$q$-SDH} assumption. The reduction incurs a loss proportional to the number of signing queries made by an adversary $\adv$.
+
+\subsubsection{BBS Presentation Proofs} \label{sec:prelims:bbs_pres}
+BBS signatures are considered particularly well-suited for anonymous credential systems, as they support efficient proofs of knowledge of a signature, achieving unlinkability of presentations. We give an overview of the optimized presentation procedure of BBS signatures, as presented in \cite{DBLP:conf/eurocrypt/TessaroZ23a}. The two cases of revealing all attributes (full disclosure) and revealing only a subset of attributes (selective disclosure) are presented seperately in the following. Both presentation protocols are instances of $\Sigma$-protocols and can be made non-interactive using the Fiat-Shamir transform.
+
+\paragraph{Full Disclosure}{
+    The protocol proceeds as follows: 
+    \begin{itemize}
+        \item \textbf{Commit}: Knowing a valid signature $(A,e)$, the prover randomizes its signatures using a random $r\gets \ZZ_p$ as $\bar{A} \gets A^r$ and $\bar{B} \gets C^r \bar{A}^{-e}$. Further, it samples $\alpha,\beta\gets \ZZ_p$ and computes $U \gets C^{\alpha} \bar{A}^{\beta}$. The prover sends $(U,\bar{A},\bar{B})$ to the verifier.
+        \item \textbf{Challenge}: The verifier samples a random challenge $\chall\gets \ZZ_p$ and sends it to the prover.
+        \item \textbf{Response}: The prover computes $s\gets \alpha +r\cdot c$, $t\gets\beta-e\cdot c$ and sends $(s,t)$ to the verifier.
+        \item \textbf{Verify}: The verifier checks whether $\pairing(\bar{A},\vk) = \pairing(\bar{B},g_2)$ and whether $U \bar{B}^{\chall} = C^s \bar{A}^t$.
+    \end{itemize}
+    Note that in the case of an honest prover, it holds that 
+    \begin{align*}
+        U \bar{B}^{\chall} 
+        &= C^{\alpha} \bar{A}^{\beta} (C^r \bar{A}^{-e})^{\chall} 
+        = C^{\alpha + r \chall} \bar{A}^{\beta - e \chall} 
+        = C^s \bar{A}^t
+    \end{align*}
+}
+
+\paragraph{Selective Disclosure}{
+    In case of selective disclosure, the prover only presents a subset of $\revealed\subseteq[n]$ attributes, while hiding the remaining $\hidden=[n]\setminus\revealed$ values. We denote the commitment to the revealed attributes by $C_\revealed$. The protocol uses additional DLOG proofs for each hidden attribute to prove knowledge of a signature as follows:
+    \begin{itemize}
+        \item \textbf{Commit}: Knowing a valid signature $(A,e)$, the prover randomizes its signatures using a random $r\gets \ZZ_p$ as $\bar{A} \gets A^r$ and $\bar{B} \gets C_\revealed^r\left(\prod_{i\in\hidden}h_i^{m_i}\right)^r \bar{A}^{-e}$. Further, it samples $\alpha,\beta,\{\delta_i\}_{i\in\hidden}\gets \ZZ_p$ and computes $U \gets C_\revealed^{\alpha} \bar{A}^{\beta}\prod_{i\in\revealed}h_i^{\delta_i}$. The prover sends $(U,\bar{A},\bar{B})$ to the verifier.
+        \item \textbf{Challenge}: The verifier samples a random challenge $\chall\gets \ZZ_p$ and sends it to the prover.
+        \item \textbf{Response}: The prover computes $s\gets \alpha +r\cdot \chall$, $t\gets\beta-e\cdot \chall$ and $u_i\gets \delta_i+r\cdot m_i\cdot \chall$ for all $i\in\hidden$. It and sends $(s,t,\{u_i\}_{i\in\hidden})$ to the verifier.
+        \item \textbf{Verify}: The verifier checks whether $\pairing(\bar{A},\vk) = \pairing(\bar{B},g_2)$ and whether $U \bar{B}^{\chall} = C_\revealed^s \bar{A}^t\prod_{i\in\hidden}h_i^{u_i}$.
+    \end{itemize}
+    For an honestly computed proof, it holds that 
+    \begin{align*}
+        U \bar{B}^{\chall}
+        =& C_\revealed^{\alpha} \bar{A}^{\beta} \prod_{i\in\hidden}h_i^{\delta_i} \left(C_\revealed^r\left(\prod_{i\in\hidden}h_i^{m_i}\right)^r\bar{A}^{-e}\right)^{\chall}
+        = C_\revealed^{\alpha + r \chall} \bar{A}^{\beta - e \chall} \prod_{i\in\hidden}h_i^{\delta_i+ r m_i \chall} 
+        = C_\revealed^s \bar{A}^t \prod_{i\in\hidden}h_i^{u_i}  
+    \end{align*}
+}
+
+
+\subsubsection{Security of BBS Presentation Proofs} \label{sec:prelims:bbs_pres_sec}
+BBS presentation proofs can be shown to be honest-verifier-zero-knowledge and special-sound \cite{DBLP:conf/eurocrypt/TessaroZ23a}. In the case of partial-dislosure, we need to rely on a computation assumptions for special-soundness, as we require an adversary to be unable to break the discrete logarithm of the generators.
